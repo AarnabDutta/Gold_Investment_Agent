@@ -26,19 +26,21 @@ services:
     healthCheckPath: /
     autoDeploy: true
 
-  # Background Worker (Optional, for future async tasks)
+  # Background Worker (Optional)
   - type: worker
     name: gold-investment-worker
     env: python
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: python worker.py
-    plan: free
     envVars:
-      - fromService:
+      - key: GOLDPRICE_API_KEY
+        fromService:
           type: web
           name: gold-investment-ai
           envVarKey: GOLDPRICE_API_KEY
-      - fromService:
+      - key: SUPABASE_URL
+        fromService:
           type: web
           name: gold-investment-ai
           envVarKey: SUPABASE_URL
