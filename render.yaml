@@ -1,0 +1,44 @@
+services:
+  # FastAPI Web Service
+  - type: web
+    name: gold-investment-ai
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api_app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.0
+      - key: GOLDPRICE_API_URL
+        sync: false
+      - key: GOLDPRICE_API_KEY
+        sync: false
+      - key: OPENROUTER_API_URL
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: LLAMA_MODEL_ID
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+    healthCheckPath: /
+    autoDeploy: true
+
+  # Background Worker (Optional, for future async tasks)
+  - type: worker
+    name: gold-investment-worker
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python worker.py
+    plan: free
+    envVars:
+      - fromService:
+          type: web
+          name: gold-investment-ai
+          envVarKey: GOLDPRICE_API_KEY
+      - fromService:
+          type: web
+          name: gold-investment-ai
+          envVarKey: SUPABASE_URL
