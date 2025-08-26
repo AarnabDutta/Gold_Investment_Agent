@@ -1,14 +1,15 @@
 services:
-  # FastAPI Web Service
   - type: web
     name: gold-investment-ai
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
     startCommand: uvicorn api_app:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9.0
+        value: 3.9
       - key: GOLDPRICE_API_URL
         sync: false
       - key: GOLDPRICE_API_KEY
@@ -26,12 +27,14 @@ services:
     healthCheckPath: /
     autoDeploy: true
 
-  # Background Worker (Optional)
+  # Optional: comment out this block if you don't need a worker.py yet
   - type: worker
     name: gold-investment-worker
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
     startCommand: python worker.py
     envVars:
       - key: GOLDPRICE_API_KEY
